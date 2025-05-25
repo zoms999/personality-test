@@ -111,7 +111,7 @@ export default function StartTestPage() {
           <BrainCircuit size={32} className="text-sky-300" strokeWidth={1.5} />
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-slate-100 mb-1">
-          옥타그노시스 AI
+          옥타그노시스
         </h1>
         <p className="text-md text-slate-400">당신의 성향을 알아보세요!</p>
       </div>
