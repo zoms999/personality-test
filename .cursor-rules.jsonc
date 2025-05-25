@@ -1,0 +1,120 @@
+// .cursor-rules.json (또는 .aispec.json)
+{
+  "projectContext": {
+    "framework": "Next.js",
+    "language": "TypeScript",
+    "appRouter": true,
+    "styling": "Tailwind CSS",
+    "stateManagement": "Zustand",
+    "formHandling": {
+      "library": "React Hook Form",
+      "validation": "Zod"
+    },
+    "dataFetching": "SWR",
+    "database": {
+      "type": "PostgreSQL",
+      "orm": "Prisma"
+    },
+    "uiComponents": "Shadcn/ui (Tailwind)"
+  },
+  "codingStyle": {
+    "typescript": {
+      "useStrict": true,
+      "explicitReturnTypes": true,
+      "preferInterfacesOverTypes": false,
+      "importOrder": ["absolute", "relative", "type"]
+    },
+    "react": {
+      "functionalComponents": true,
+      "arrowFunctionsForComponents": true,
+      "useStateHookOrder": "alphabetical",
+      "customHookPrefix": "use"
+    },
+    "namingConventions": {
+      "components": "PascalCase",
+      "hooks": "camelCase",
+      "apiRoutes": "kebab-case-or-snake_case",
+      "variables": "camelCase",
+      "constants": "UPPER_SNAKE_CASE"
+    },
+    "comments": {
+      "encourageJsDoc": true,
+      "todoFormat": "TODO: [담당자/날짜] 설명"
+    }
+  },
+  "preferredLibraries": {
+    "icons": "lucide-react",
+    "dateHandling": "date-fns"
+  },
+  "directories": {
+    "components": "src/components",
+    "hooks": "src/hooks",
+    "lib": "src/lib",
+    "apiRoutes": "src/app/api",
+    "pages": "src/app",
+    "types": "src/lib/types.ts",
+    "zodSchemas": "src/lib/zod-schemas.ts"
+  },
+  "fileTemplates": {
+    "component": [
+      "'use client';",
+      "",
+      "import React from 'react';",
+      "",
+      "interface MyComponentProps {",
+      "  // props 정의",
+      "}",
+      "",
+      "const MyComponent: React.FC<MyComponentProps> = ({ /* props */ }) => {",
+      "  return (",
+      "    <div>",
+      "      {/* Component JSX */}",
+      "    </div>",
+      "  );",
+      "};",
+      "",
+      "export default MyComponent;"
+    ],
+    "apiRoute": [
+      "import { NextResponse } from 'next/server';",
+      "import { z } from 'zod';",
+      "",
+      "export async function GET(request: Request) {",
+      "  try {",
+      "    return NextResponse.json({ message: 'GET request successful' });",
+      "  } catch (error) {",
+      "    console.error('[API_EXAMPLE_GET_ERROR]', error);",
+      "    return new NextResponse('Internal Server Error', { status: 500 });",
+      "  }",
+      "}",
+      "",
+      "export async function POST(request: Request) {",
+      "  try {",
+      "    return NextResponse.json({ message: 'POST request successful' }, { status: 201 });",
+      "  } catch (error) {",
+      "    console.error('[API_EXAMPLE_POST_ERROR]', error);",
+      "    if (error instanceof z.ZodError) {",
+      "      return NextResponse.json({ error: 'Invalid input', details: error.flatten() }, { status: 400 });",
+      "    }",
+      "    return new NextResponse('Internal Server Error', { status: 500 });",
+      "  }",
+      "}"
+    ]
+  },
+  "commonInstructions": [
+    "모든 코드는 TypeScript로 작성해주세요.",
+    "에러 처리를 철저히 하고, 명확한 에러 메시지를 반환해주세요.",
+    "환경 변수는 `.env.local` 파일을 통해 관리하고, 코드에 하드코딩하지 마세요.",
+    "Prisma 사용 시, 데이터베이스 작업은 비동기(async/await)로 처리해주세요.",
+    "API 응답은 `NextResponse.json()`을 사용해주세요.",
+    "클라이언트 컴포넌트에는 'use client'; 지시문을 파일 상단에 추가해주세요.",
+    "JSDoc 스타일의 주석을 사용하여 주요 함수와 컴포넌트에 대한 설명을 추가해주세요."
+  ],
+  "ignoredPatterns": [
+    "node_modules/",
+    ".next/",
+    "out/",
+    ".vscode/",
+    "*.log"
+  ]
+}

@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 다크 모드 배경 애니메이션 */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.05); }
+}
+
+@keyframes pulse-slower {
+  0%, 100% { opacity: 0.25; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(1.03); }
+}
+
+@keyframes pulse-even-slower {
+  0%, 100% { opacity: 0.2; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.02); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 8s infinite ease-in-out;
+}
+
+.animate-pulse-slower {
+  animation: pulse-slower 10s infinite ease-in-out;
+}
+
+.animate-pulse-even-slower {
+  animation: pulse-even-slower 12s infinite ease-in-out;
+}

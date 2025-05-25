@@ -1,0 +1,90 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma" // 경로 확인
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model PersonalityTypes {
+  id                  String    @id @default(uuid()) @db.Uuid
+  type_code           String    @unique @db.VarChar(20)
+  type_name           String    @db.VarChar(100)
+  title               String    @db.VarChar(500) // 추가됨
+  theme_sentence      String    @db.Text         // 추가됨
+  description         String    @db.Text
+  description_points  Json      @db.JsonB        // JsonB 명시
+  strength_keywords   Json      @db.JsonB
+  weakness_keywords   Json      @db.JsonB
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  questions           Questions[]
+  test_results_primary TestResults[] @relation("PrimaryResultForType") // 대표 결과 유형으로 사용될 때
+  @@map("personality_types")
+}
+
+model Questions {
+  id                     Int             @id @default(autoincrement())
+  personality_type_id    String          @db.Uuid // PersonalityTypes.id 참조
+  question_text          String          @db.Text
+  question_order_in_type Int             @default(1)
+  is_active              Boolean         @default(true)
+  created_at             DateTime        @default(now())
+  updated_at             DateTime        @updatedAt
+  personality_type       PersonalityTypes @relation(fields: [personality_type_id], references: [id], onDelete: Cascade)
+  user_answers           UserAnswers[]
+  @@map("questions")
+}
+
+model TestAttempts {
+  id                String        @id @default(uuid()) @db.Uuid
+  // gender           String        // 이전 요구사항에 있었음, 추가 필요
+  // age              Int           // 이전 요구사항에 있었음, 추가 필요
+  session_id        String?       @db.VarChar(255)
+  user_name         String?       @db.VarChar(100)
+  user_email        String?       @db.VarChar(255)
+  ip_address        String?       @db.VarChar(45)
+  user_agent        String?       @db.Text
+  is_completed      Boolean       @default(false)
+  completion_time   Int?
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  user_answers      UserAnswers[]
+  test_result       TestResults?  // 1:1 관계이므로 단수형, Nullable
+  @@map("test_attempts")
+}
+
+model UserAnswers {
+  id                String        @id @default(uuid()) @db.Uuid
+  test_attempt_id   String        @db.Uuid
+  question_id       Int           // Questions.id 참조
+  answer_option     String?       @db.VarChar(10) // UI에서 점수만 받으면 이 필드는 불필요할 수 있음
+  score             Int           // **1~10점 범위로 가정 (애플리케이션 레벨에서 Zod로 검증)**
+  answer_time       Int?
+  created_at        DateTime      @default(now())
+  test_attempt      TestAttempts  @relation(fields: [test_attempt_id], references: [id], onDelete: Cascade)
+  question          Questions     @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  @@unique([test_attempt_id, question_id])
+  @@map("user_answers")
+}
+
+model TestResults {
+  id                   String            @id @default(uuid()) @db.Uuid
+  test_attempt_id      String            @unique @db.Uuid // TestAttempts.id 참조 (1:1 관계)
+  primary_personality_type_id String?   @db.Uuid // 가장 높은 점수를 받은 대표 유형의 ID (Nullable, 동점일 경우 선택적)
+  total_scores         Json              @db.JsonB // 모든 유형의 점수를 JSON으로 저장 {"type_id_or_code": score, ...}
+  percentage_scores    Json?             @db.JsonB // 선택 사항
+  detailed_analysis    Json?             @db.JsonB
+  recommendations      Json?             @db.JsonB
+  share_token          String?           @unique @db.VarChar(32)
+  is_shared            Boolean           @default(false)
+  created_at           DateTime          @default(now())
+  updated_at           DateTime          @updatedAt     // 추가됨
+  test_attempt         TestAttempts      @relation(fields: [test_attempt_id], references: [id], onDelete: Cascade)
+  primary_personality_type PersonalityTypes? @relation("PrimaryResultForType", fields: [primary_personality_type_id], references: [id], onDelete:SetNull) // onDelete:SetNull 또는 Restrict
+  @@map("test_results")
+}
